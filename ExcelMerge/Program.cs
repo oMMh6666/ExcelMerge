@@ -225,7 +225,7 @@ namespace ExcelMerge
             }
 
             // 生成合并的Excel文件
-            var outputFile = Path.Combine(Environment.CurrentDirectory, $"合并结果({DateTime.Now.Hour}-{DateTime.Now.Minute}-{DateTime.Now.Second}).xlsx");
+            var outputFile = Path.Combine(Environment.CurrentDirectory, $"合并结果({DateTime.Now.ToString("HH-mm-ss")}).xlsx");
             using (var fileStream = new FileStream(outputFile, FileMode.Create, FileAccess.Write))
             {
                 outputWorkbook.Write(fileStream);
