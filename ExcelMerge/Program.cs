@@ -282,7 +282,17 @@ namespace ExcelMerge
                         if (cell != null)
                         {
                             ICell newCell = outputRow.CreateCell(col);
+
+                            // 复制单元格类型
+                            newCell.SetCellType(cell.CellType);
+
+                            // 复制单元格值
                             newCell.SetCellValue(cell.ToString());
+
+                            // 复制单元格样式
+                            ICellStyle newStyle = outputWorkbook.CreateCellStyle();
+                            newStyle.CloneStyleFrom(cell.CellStyle); // 克隆样式
+                            newCell.CellStyle = newStyle; // 应用样式
                         }
                     }
                 }
