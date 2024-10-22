@@ -126,7 +126,7 @@ namespace ExcelMerge
 
 
         // 合并Excel文件，默认不进行自动列宽操作
-        private static void MergeExcel(List<SrcExcel> lstSrcExcel, bool AutoSizeColumn = false)
+        private static void MergeExcel(List<SrcExcel> lstSrcExcel, string OutputFileName = "", bool AutoSizeColumn = false)
         {
             IWorkbook outputWorkbook = new XSSFWorkbook();
 
@@ -250,8 +250,21 @@ namespace ExcelMerge
                 }
             }
 
+            string outputFile = string.Empty;
+            if (string.IsNullOrWhiteSpace(OutputFileName))
+            {
+                outputFile = Path.Combine(Environment.CurrentDirectory, $"合并结果({DateTime.Now.ToString("HH-mm-ss")}).xlsx");
+            }
+            else
+            {
+                outputFile = Path.Combine(Environment.CurrentDirectory, OutputFileName);
+                if (File.Exists(outputFile))
+                {
+                    File.Delete(outputFile);
+                }
+            }
+
             // 生成合并的Excel文件
-            var outputFile = Path.Combine(Environment.CurrentDirectory, $"合并结果({DateTime.Now.ToString("HH-mm-ss")}).xlsx");
             using (var fileStream = new FileStream(outputFile, FileMode.Create, FileAccess.Write))
             {
                 outputWorkbook.Write(fileStream);
@@ -279,7 +292,7 @@ namespace ExcelMerge
 
             if (lstSrcExcel.Count > 1)
             {
-                MergeExcel(lstSrcExcel, config.AutoSizeColumn);
+                MergeExcel(lstSrcExcel, config.Output, config.AutoSizeColumn);
                 Console.WriteLine("按换行键退出...");
                 Console.ReadLine();
             }
@@ -335,8 +348,14 @@ namespace ExcelMerge
 
     public class Config
     {
+        // 对合并的Excel每个Sheet内的列是否进行自动列宽操作，会增加合并文件的时间
         public bool AutoSizeColumn { get; set; }
+        
+        // 需要合并的Excel文件完整路径列表，一行一个，以- 开头
         public List<string> Excels { get; set; }
+
+        // 输出的文件名，若未指定，则以 合并结果(时-分-秒).xlsx 保存，若指定，如目录下有同名文件则会先删除
+        public string Output { get; set; }
     }
 
 
