@@ -178,11 +178,37 @@ namespace ExcelMerge
                                         {
                                             ICell newCell = outputRow.CreateCell(col);
 
-                                            // 复制单元格类型
-                                            newCell.SetCellType(cell.CellType);
+                                            switch (cell.CellType)
+                                            {
+                                                case CellType.String:  // 如果单元格是文本类型
+                                                    newCell.SetCellValue(cell.ToString());
+                                                    break;
+                                                case CellType.Numeric: // 如果单元格是数值类型
+                                                    // 判断cell是否为日期类型
+                                                    if (DateUtil.IsCellDateFormatted(cell))
+                                                    {
+                                                        DateTime? sourceDate = cell.DateCellValue;
+                                                        if (sourceDate.HasValue)
+                                                        {
+                                                            // SetCellValue只接受非nullable的DateTime，所以要传递sourceDate.Value
+                                                            newCell.SetCellValue(sourceDate.Value);
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        newCell.SetCellValue(cell.NumericCellValue);
+                                                    }
 
-                                            // 复制单元格值
-                                            newCell.SetCellValue(cell.ToString());
+                                                    break;
+                                                //case CellType.Boolean:  // 如果单元格是布尔值
+                                                //    break;
+                                                //case CellType.Blank:  // 如果单元格是空白
+                                                //    break;
+                                                default:
+                                                    newCell.SetCellValue(cell.ToString());
+                                                    break;
+                                            }
+
 
                                             // 复制单元格样式
                                             ICellStyle newStyle = outputWorkbook.CreateCellStyle();
